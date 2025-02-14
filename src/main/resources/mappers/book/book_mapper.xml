@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.korit.springboot_study.mapper.BookMapper">
+    <resultMap id="authorResultMap" type="com.korit.springboot_study.entity.Author">
+        <id property="authorId" column="at_author_id" />
+        <result property="authorName" column="author_name" />
+    </resultMap>
+
+    <resultMap id="categoryResultMap" type="com.korit.springboot_study.entity.Category">
+        <id property="categoryId" column="ct_category_id" />
+        <result property="categoryName" column="category_name" />
+    </resultMap>
+
+    <resultMap id="publisherResultMap" type="com.korit.springboot_study.entity.Publisher">
+        <id property="publisherId" column="pt_publisher_id" />
+        <result property="publisherName" column="publisher_name" />
+    </resultMap>
+
+    <resultMap id="bookResultMap" type="com.korit.springboot_study.entity.Book">
+        <id property="bookId" column="book_id" />
+        <result property="bookName" column="book_name" />
+        <result property="authorId" column="bt_author_id" />
+        <result property="isbn" column="isbn" />
+        <result property="categoryId" column="bt_category_id" />
+        <result property="publisherId" column="bt_publisher_id" />
+        <result property="bookImgUrl" column="book_img_url" />
+        <association property="author" resultMap="authorResultMap" />
+        <association property="category" resultMap="categoryResultMap" />
+        <association property="publisher" resultMap="publisherResultMap" />
+    </resultMap>
+
+
+    <select id="selectBooks" resultMap="bookResultMap">
+        select
+            bt.book_id,
+            bt.book_name,
+            bt.author_id as bt_author_id,
+            bt.isbn,
+            bt.category_id as bt_category_id,
+            bt.publisher_id as bt_publisher_id,
+            bt.book_img_url,
+
+            at.author_id as at_author_id,
+            at.author_name,
+
+            ct.category_id as ct_category_id,
+            ct.category_name,
+
+            pt.publisher_id as pt_publisher_id,
+            pt.publisher_name
+        from
+            book_tb bt
+            left outer join author_tb at on(at.author_id = bt.author_id)
+            left outer join category_tb ct on(ct.category_id = bt.category_id)
+            left outer join publisher_tb pt on(pt.publisher_id = bt.publisher_id)
+        where
+            bt.book_name like concat("%", #{bookName}, "%");
+    </select>
+
+    <resultMap id="booksAllResultMap" type="com.korit.springboot_study.entity.Book">
+        <id property="bookId" column="book_id" />
+        <result property="bookName" column="book_name" />
+        <result property="authorId" column="author_id" />
+        <result property="isbn" column="isbn" />
+        <result property="categoryId" column="category_id" />
+        <result property="publisherId" column="publisher_id" />
+        <result property="bookImgUrl" column="book_img_url" />
+    </resultMap>
+    <select id="selectAllBooks" resultMap="booksAllResultMap">
+        select
+            bt.book_id,
+            bt.book_name,
+            bt.author_id,
+            bt.isbn,
+            bt.category_id,
+            bt.publisher_id,
+            bt.book_img_url
+        from
+            book_tb bt
+    </select>
+
+    <insert id="insertBook" keyProperty="bookId" useGeneratedKeys="true">
+        insert book_tb
+        values (default, #{bookName}, #{authorId}, #{isbn}, #{categoryId}, #{publisherId}, #{bookImgUrl})
+    </insert>
+
+    <update id="updateBook">
+        update
+            book_tb
+        set
+            book_name = #{bookName}
+        where
+            book_id = #{bookId}
+    </update>
+
+    <delete id="deleteBook">
+        delete from
+            book_tb
+        where
+            book_name = #{bookName}
+    </delete>
+
+</mapper>

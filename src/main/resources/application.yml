@@ -1,0 +1,22 @@
+spring:
+  config:
+    import: application-secret.yml
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+
+mybatis:
+  mapper-locations:
+    - /mappers/*.xml
+    - /mappers/book/*.xml
+    - /mappers/user/*.xml
+    - /mappers/post/*.xml
+
+logging:
+  config: classpath:log4j2.xml
+  file:
+    path: logs
+
+oauth2:
+  client:
+    redirect_uri: http://localhost:3000/oauth2

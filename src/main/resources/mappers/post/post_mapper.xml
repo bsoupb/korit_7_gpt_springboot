@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.korit.springboot_study.mapper.PostMapper">
+    <resultMap id="postResultMap" type="com.korit.springboot_study.entity.Post">
+        <id property="postId" column="post_id" />
+        <result property="userId" column="pt_user_id" />
+        <result property="title" column="title" />
+        <result property="content" column="content" />
+        <result property="createdAt" column="created_at" />
+        <result property="updatedAt" column="updated_at" />
+        <result property="likeCount" column="like_count" />
+        <association property="user" resultMap="userResultMap" />
+    </resultMap>
+
+    <resultMap id="userResultMap" type="com.korit.springboot_study.entity.User">
+        <id property="userId" column="ut_user_id" />
+        <result property="username" column="username" />
+    </resultMap>
+
+    <select id="selectById" resultMap="postResultMap">
+        with cte_post_like_count_tb as (
+            select
+                post_id,
+                count(post_id) as like_count
+            from
+                post_like_tb
+            group by
+                post_id
+        )
+        select
+            pt.post_id,
+
+            pt.user_id as pt_user_id,
+            ut.user_id as ut_user_id,
+            ut.username,
+
+            pt.title,
+            pt.content,
+            pt.created_at,
+            pt.updated_at,
+
+            ifnull(cplct.like_count, 0) as like_count
+        from
+            post_tb pt
+            inner join user_tb ut on(ut.user_id = pt.user_id)
+            left outer join cte_post_like_count_tb cplct on(cplct.post_id = pt.post_id)
+        where
+            pt.post_id = #{postId}
+    </select>
+
+    <select id="selectAllBykeywordContaining" resultMap="postResultMap">
+        with cte_post_like_count_tb as (
+            select
+                post_id,
+                count(post_id) as like_count
+            from
+                post_like_tb
+            group by
+                post_id
+        )
+        select
+            pt.post_id,
+
+            pt.user_id as pt_user_id,
+            ut.user_id as ut_user_id,
+            ut.username,
+
+            pt.title,
+            pt.content,
+            pt.created_at,
+            pt.updated_at,
+
+            ifnull(cplct.like_count, 0) as like_count
+        from
+            post_tb pt
+            inner join user_tb ut on(ut.user_id = pt.user_id)
+            left outer join cte_post_like_count_tb cplct on(cplct.post_id = pt.post_id)
+        where
+            title like concat("%", #{keyword}, "%")
+            or content like concat("%", #{keyword}, "%")
+        order by
+            pt.post_id desc
+        limit #{startIndex}, #{limitCount}     <!-- starting index, limit count -->
+    </select>
+
+    <insert id="insert" keyProperty="postId" useGeneratedKeys="true">
+        insert into post_tb
+        values(default, #{userId}, #{title}, #{content}, now(), now())
+    </insert>
+</mapper>

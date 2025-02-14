@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.korit.springboot_study.mapper.StudentStudyMapper">
+    <resultMap id="majorResultMap" type="com.korit.springboot_study.entity.study.Major"> <!-- type: 경로, id: 이름 -->
+        <id property="majorId" column="major_id" /> <!-- primary key -->
+        <result property="majorName" column="major_name" />
+    </resultMap>
+
+    <select id="selectMajorsAll" resultMap="majorResultMap">   <!-- id: 이름 -->
+        select
+            major_id,
+            major_name
+        from
+            major_tb
+    </select>
+
+    <resultMap id="instructorResultMap" type="com.korit.springboot_study.entity.study.Instructor">
+        <id property="instructorId" column="instructor_id" />
+        <result property="instructorName" column="instructor_name" />
+    </resultMap>
+    <select id="selectInstructorsAll" resultMap="instructorResultMap">
+        select
+            instructor_id,
+            instructor_name
+        from
+            instructor_tb
+    </select>
+
+    <insert id="insertMajor" keyProperty="majorId" useGeneratedKeys="true">   <!-- int 리턴(성공횟수) -->
+        insert into major_tb
+        values (default, #{majorName})
+    </insert>
+
+    <insert id="insertInstructor" keyProperty="instructorId" useGeneratedKeys="true">
+        insert into instructor_tb
+        values (default, #{instructorName})
+    </insert>
+
+    <update id="updateMajorName">
+        update
+            major_tb
+        set
+            major_name = #{majorName}
+        where
+            major_id = #{majorId}
+    </update>
+
+</mapper>
+
