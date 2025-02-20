@@ -28,10 +28,10 @@ public class JwtProvider {
 
     public String createAccessToken(User user) {
         return Jwts.builder()
-                .claim("userId", user.getUserId())
+                .claim("userId", user.getUserId())  // 사용자 ID 저장
                 .claim("roles", user.getUserRoles().stream().map(userRole -> userRole.getRole().getRoleName()).collect(Collectors.toList()))
-                .setExpiration(getExpireDate())
-                .signWith(key, SignatureAlgorithm.HS256)
+                .setExpiration(getExpireDate())     // 토큰 만료 시간 설정
+                .signWith(key, SignatureAlgorithm.HS256)    // 토큰 서명
                 .compact();
     }
     // payload -> claim
@@ -44,10 +44,10 @@ public class JwtProvider {
     public Claims parseToken(String token) {
         Claims claims = null;
         try {
-            JwtParser parser = Jwts.parserBuilder()
-                    .setSigningKey(key)
+            JwtParser parser = Jwts.parserBuilder()     // JWT를 해석할 수 있는 Parser 객체 생성
+                    .setSigningKey(key)     // 토큰이 변조되지 않았는지 서명을 검증하기 위해 비밀 키 사용
                     .build();
-            claims = parser.parseClaimsJws(removeBearer(token)).getBody();
+            claims = parser.parseClaimsJws(token).getBody();  // JWT를 파싱하고 안에 있는 Claims(사용자 정보) 추출
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -55,7 +55,7 @@ public class JwtProvider {
     }
 
     // Authorization -> AccessToken(Bearer ?????.?????.?????)
-    private String removeBearer(String bearerToken) {
+    public String removeBearer(String bearerToken) {
         String token = null;
         final String BEARER_KEYWORD = "Bearer ";
         if(bearerToken.startsWith(BEARER_KEYWORD)) {

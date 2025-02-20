@@ -12,6 +12,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
+// 사용자 인증 정보
 @Getter
 @AllArgsConstructor
 public class PrincipalUser implements UserDetails {
@@ -21,7 +22,7 @@ public class PrincipalUser implements UserDetails {
     public Collection<? extends GrantedAuthority> getAuthorities() {    // 자식 요소들만 제네릭으로 들어올 수 있음
         return user.getUserRoles()
                 .stream()
-                .map(userRole -> new SimpleGrantedAuthority(userRole.getRole().getRoleName()))
+                .map(userRole -> new SimpleGrantedAuthority(userRole.getRole().getRoleName()))  // SimpleGrantedAuthority: Spring Security에서 권한을 나타내는 기본 클래스
                 .collect(Collectors.toList());
     }
 
